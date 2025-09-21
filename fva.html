@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cowrywise Voice Recorder</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #3b82f6 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .recorder-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .logo {
+            margin-bottom: 1px;
+        }
+
+        .logo-icon {
+            margin-bottom: 1px;
+        }
+
+        .logo h1 {
+            color: #0062ea;
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .logo p {
+            color: #718096;
+            font-size: 1em;
+        }
+
+        .visualizer-container {
+            height: 120px;
+            margin: 30px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .wave-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            gap: 3px;
+        }
+
+        .wave-bar {
+            width: 4px;
+            background: linear-gradient(to top, #1e40af, #3b82f6);
+            border-radius: 2px;
+            transition: height 0.1s ease;
+            height: 10px;
+        }
+
+        .loader {
+            display: none;
+            width: 50px;
+            height: 50px;
+            border: 4px solid #e2e8f0;
+            border-top: 4px solid #1e40af;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .record-button {
+            background: linear-gradient(135deg, #1e40af, #3b82f6);
+            border: none;
+            border-radius: 50%;
+            width: 80px;
+            height: 80px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px rgba(30, 64, 175, 0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto 20px;
+        }
+
+        .record-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px rgba(30, 64, 175, 0.4);
+        }
+
+        .record-button.recording {
+            background: linear-gradient(135deg, #e53e3e, #fc8181);
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .record-icon {
+            width: 24px;
+            height: 24px;
+            fill: white;
+        }
+
+        .status-text {
+            color: #4a5568;
+            font-size: 1em;
+            margin-bottom: 20px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .silence-indicator {
+            background: #fed7d7;
+            color: #c53030;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .permissions-message {
+            background: #fef5e7;
+            color: #c05621;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 0.9em;
+            display: none;
+        }
+
+        .playback-button {
+            background: #1e40af;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .playback-button:hover {
+            background: #1d4ed8;
+        }
+    </style>
+</head>
+<body>
+    <div class="recorder-container">
+        <div class="logo">
+            <div class="logo-icon">
+                <img id="logoImage" src="cw-logo.png" alt="Cowrywise Logo" style="width: 80px; height:80px; object-fit: contain;">
+            </div>
+            <h1>Cowrywise</h1>
+            <p>Voice Assistant</p>
+        </div>
+
+        <div class="permissions-message" id="permissionsMessage" style="display: none;">
+            Please allow microphone access to use the voice recorder.
+        </div>
+
+        <div class="visualizer-container">
+            <div class="wave-container" id="waveContainer">
+                <!-- Wave bars will be generated here -->
+            </div>
+            <div class="loader" id="loader"></div>
+        </div>
+
+        <button class="record-button" id="recordButton">
+            <svg class="record-icon" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="8" id="recordCircle"/>
+            </svg>
+        </button>
+
+        <div class="status-text" id="statusText">Click to ask your question</div>
+        <div class="silence-indicator" id="silenceIndicator">Listening for silence...</div>
+        
+        <div class="playback-container" id="playbackContainer" style="margin-top: 20px;">
+            <audio id="responsePlayer" style="display: none;"></audio>
+            <button id="playPauseBtn" class="playback-button" style="display: none; margin-top: 10px;">
+                <span id="playPauseBtnText">🔄 Replay</span>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        class VoiceRecorder {
+            constructor() {
+                this.isRecording = false;
+                this.isWaitingResponse = false;
+                this.isPlaying = false;
+                this.mediaRecorder = null;
+                this.audioContext = null;
+                this.analyser = null;
+                this.microphone = null;
+                this.dataArray = null;
+                this.animationId = null;
+                this.silenceTimer = null;
+                this.silenceThreshold = 30;
+                this.silenceCount = 0;
+                this.maxSilenceCount = 100; // ~2 seconds at 60fps
+                
+                this.recordButton = document.getElementById('recordButton');
+                this.statusText = document.getElementById('statusText');
+                this.waveContainer = document.getElementById('waveContainer');
+                this.loader = document.getElementById('loader');
+                this.silenceIndicator = document.getElementById('silenceIndicator');
+                this.permissionsMessage = document.getElementById('permissionsMessage');
+                this.playbackContainer = document.getElementById('playbackContainer');
+                this.responsePlayer = document.getElementById('responsePlayer');
+                this.playPauseBtn = document.getElementById('playPauseBtn');
+                this.playPauseBtnText = document.getElementById('playPauseBtnText');
+                
+                this.initializeWaveBars();
+                this.bindEvents();
+                this.bindPlaybackEvents();
+            }
+
+            initializeWaveBars() {
+                // Create 20 wave bars
+                for (let i = 0; i < 20; i++) {
+                    const bar = document.createElement('div');
+                    bar.className = 'wave-bar';
+                    this.waveContainer.appendChild(bar);
+                }
+            }
+
+            bindEvents() {
+                this.recordButton.addEventListener('click', () => {
+                    if (this.isRecording) {
+                        this.stopRecording();
+                    } else if (!this.isWaitingResponse) {
+                        this.startRecording();
+                    }
+                });
+            }
+
+            bindPlaybackEvents() {
+                this.playPauseBtn.addEventListener('click', () => {
+                    this.togglePlayPause();
+                });
+
+                this.responsePlayer.addEventListener('play', () => {
+                    this.isPlaying = true;
+                    this.playPauseBtnText.textContent = '⏸️ Pause';
+                    this.statusText.textContent = 'Playing response...';
+                    this.startResponseVisualization();
+                });
+
+                this.responsePlayer.addEventListener('pause', () => {
+                    this.isPlaying = false;
+                    this.playPauseBtnText.textContent = '▶️ Continue';
+                    this.statusText.textContent = 'Playback paused';
+                    this.stopResponseVisualization();
+                });
+
+                this.responsePlayer.addEventListener('ended', () => {
+                    this.isPlaying = false;
+                    this.playPauseBtnText.textContent = '🔄 Replay';
+                    this.statusText.textContent = 'Click to start recording';
+                    this.stopResponseVisualization();
+                });
+            }
+
+            togglePlayPause() {
+                if (!this.responsePlayer.src) return;
+
+                if (this.responsePlayer.paused || this.responsePlayer.ended) {
+                    if (this.responsePlayer.ended) {
+                        this.responsePlayer.currentTime = 0;
+                    }
+                    this.responsePlayer.play();
+                } else {
+                    this.responsePlayer.pause();
+                }
+            }
+
+            async startRecording() {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ 
+                        audio: {
+                            echoCancellation: true,
+                            noiseSuppression: true,
+                            autoGainControl: true
+                        } 
+                    });
+                    
+                    this.setupAudioAnalysis(stream);
+                    this.setupMediaRecorder(stream);
+                    
+                    this.mediaRecorder.start();
+                    this.isRecording = true;
+                    this.silenceCount = 0;
+                    
+                    this.updateUI('recording');
+                    this.startVisualization();
+                    
+                } catch (error) {
+                    console.error('Error accessing microphone:', error);
+                    // Auto-grant microphone access or show error
+                    this.statusText.textContent = 'Microphone access required';
+                }
+            }
+
+            setupAudioAnalysis(stream) {
+                this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                this.analyser = this.audioContext.createAnalyser();
+                this.microphone = this.audioContext.createMediaStreamSource(stream);
+                
+                this.analyser.fftSize = 256;
+                const bufferLength = this.analyser.frequencyBinCount;
+                this.dataArray = new Uint8Array(bufferLength);
+                
+                this.microphone.connect(this.analyser);
+            }
+
+            setupMediaRecorder(stream) {
+                this.mediaRecorder = new MediaRecorder(stream);
+                let audioChunks = [];
+
+                this.mediaRecorder.ondataavailable = (event) => {
+                    if (event.data.size > 0) audioChunks.push(event.data);
+                };
+
+                this.mediaRecorder.onstop = async () => {
+                    const audioBlob = new Blob(audioChunks, { type: "audio/wav" });
+                    
+                    this.updateUI('processing');
+                    
+                    const formData = new FormData();
+                    formData.append("audio", audioBlob, "audio.wav");
+
+                    try {
+                        const response = await fetch("http://127.0.0.1:9000/voice-assist", {
+                            method: "POST",
+                            body: formData
+                        });
+
+                        if (!response.ok) {
+                            const errorText = await response.text();
+                            throw new Error("Error: " + errorText);
+                        }
+
+                        const audioData = await response.blob();
+                        this.playResponseAudio(audioData);
+                    } catch (error) {
+                        console.error('Error:', error);
+                        alert("Error: " + error.message);
+                        this.handleError();
+                    }
+                    
+                    audioChunks = [];
+                };
+            }
+
+            startVisualization() {
+                const animate = () => {
+                    if (!this.isRecording && !this.isWaitingResponse) return;
+
+                    this.analyser.getByteFrequencyData(this.dataArray);
+                    
+                    // Check for silence
+                    const average = this.dataArray.reduce((sum, val) => sum + val, 0) / this.dataArray.length;
+                    
+                    if (this.isRecording) {
+                        if (average < this.silenceThreshold) {
+                            this.silenceCount++;
+                            if (this.silenceCount > 30) { // Show indicator after 0.5 seconds
+                                this.silenceIndicator.style.display = 'block';
+                            }
+                            if (this.silenceCount >= this.maxSilenceCount) {
+                                this.stopRecording();
+                                return;
+                            }
+                        } else {
+                            this.silenceCount = 0;
+                            this.silenceIndicator.style.display = 'none';
+                        }
+                    }
+
+                    // Update wave bars
+                    const bars = this.waveContainer.children;
+                    for (let i = 0; i < bars.length; i++) {
+                        const barHeight = (this.dataArray[i * 6] / 255) * 80 + 10;
+                        bars[i].style.height = `${barHeight}px`;
+                    }
+
+                    this.animationId = requestAnimationFrame(animate);
+                };
+                animate();
+            }
+
+            stopRecording() {
+                if (this.mediaRecorder && this.mediaRecorder.state !== 'inactive') {
+                    this.mediaRecorder.stop();
+                }
+                
+                this.isRecording = false;
+                this.silenceIndicator.style.display = 'none';
+                
+                // Stop all tracks
+                if (this.microphone) {
+                    this.microphone.mediaStream.getTracks().forEach(track => track.stop());
+                }
+                
+                this.updateUI('processing');
+            }
+
+            playResponseAudio(audioData) {
+                const audioUrl = URL.createObjectURL(audioData);
+                this.responsePlayer.src = audioUrl;
+                
+                // Show the play/pause button
+                this.playPauseBtn.style.display = 'inline-block';
+                this.playPauseBtnText.textContent = '🔄 Replay';
+                
+                // Auto-play the response
+                this.responsePlayer.play();
+            }
+
+            startResponseVisualization() {
+                // Simple wave animation during playback
+                const bars = this.waveContainer.children;
+                let frame = 0;
+                
+                const animateResponse = () => {
+                    if (!this.isPlaying) return;
+                    
+                    for (let i = 0; i < bars.length; i++) {
+                        const height = Math.sin((frame + i) * 0.3) * 30 + 40;
+                        bars[i].style.height = `${height}px`;
+                    }
+                    frame++;
+                    
+                    this.animationId = requestAnimationFrame(animateResponse);
+                };
+                
+                this.waveContainer.style.display = 'flex';
+                this.loader.style.display = 'none';
+                animateResponse();
+            }
+
+            stopResponseVisualization() {
+                if (this.animationId) {
+                    cancelAnimationFrame(this.animationId);
+                }
+                
+                // Reset wave bars to default state
+                const bars = this.waveContainer.children;
+                for (let bar of bars) {
+                    bar.style.height = '10px';
+                }
+            }
+
+            handleError() {
+                this.isWaitingResponse = false;
+                this.statusText.textContent = 'Error occurred. Try again.';
+                this.resetUI();
+            }
+
+            updateUI(state) {
+                const button = this.recordButton;
+                const circle = document.getElementById('recordCircle');
+                
+                switch (state) {
+                    case 'recording':
+                        button.classList.add('recording');
+                        this.statusText.textContent = 'Recording... Speak now';
+                        this.waveContainer.style.display = 'flex';
+                        this.loader.style.display = 'none';
+                        break;
+                    case 'processing':
+                        button.classList.remove('recording');
+                        this.statusText.textContent = 'Processing...';
+                        this.waveContainer.style.display = 'none';
+                        this.loader.style.display = 'block';
+                        break;
+                }
+            }
+
+            resetUI() {
+                this.isRecording = false;
+                this.isWaitingResponse = false;
+                this.isPlaying = false;
+                this.recordButton.classList.remove('recording');
+                this.statusText.textContent = 'Click to start recording';
+                this.waveContainer.style.display = 'flex';
+                this.loader.style.display = 'none';
+                this.silenceIndicator.style.display = 'none';
+                
+                // Reset wave bars
+                const bars = this.waveContainer.children;
+                for (let bar of bars) {
+                    bar.style.height = '10px';
+                }
+                
+                if (this.animationId) {
+                    cancelAnimationFrame(this.animationId);
+                }
+            }
+        }
+
+        // Initialize the voice recorder when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new VoiceRecorder();
+            
+            // Function to set logo image when provided
+            window.setLogoImage = function(imageUrl) {
+                const logoImg = document.getElementById('logoImage');
+                logoImg.src = imageUrl;
+                logoImg.style.display = 'block';
+            };
+        });
+    </script>
+</body>
+</html>
