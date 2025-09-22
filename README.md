@@ -64,14 +64,15 @@ Voice Input → Whisper (STT) → Embeddings (Sentence Transformers)
 
 `500faq.csv` contains a few FAQs sourced from **publicly available info** (e.g., “What is Cowrywise?”).
 
+## 🎥 Demo Video
+[![Watch the demo](static/demo-tnail.png)](https://youtu.be/z0AT1Pk5gw0)
+*( May take a few seconds to respond on free hosting.)*
+
 ## 📝 Roadmap
 
 * [ ] Integrate with LLM
 
-## 🚀 Live Demo
-Try it here: [voice-faq-assistant-demo](https://cw-voice-assistant-5c68.onrender.com)
 
-*(Demo runs on few sample FAQs from public info. May take a few seconds to respond on free hosting.)*
 
 
 ## 👨‍💻 Author
