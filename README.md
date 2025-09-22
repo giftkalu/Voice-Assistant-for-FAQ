@@ -76,6 +76,9 @@ question,answer
 * Requires microphone permission
 * Latency may occur on first load
 
+## Further Work
+* Integrate with an LLM 
+
 ## 👨‍💻 Author
 
 **Gift Kalu** – *Your Creative Data Scientist*
