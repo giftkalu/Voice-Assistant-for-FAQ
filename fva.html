@@ -176,7 +176,7 @@
     <div class="recorder-container">
         <div class="logo">
             <div class="logo-icon">
-                <img id="logoImage" src="cw-logo.png" alt="Cowrywise Logo" style="width: 80px; height:80px; object-fit: contain;">
+                <img id="logoImage" src="/static/images/cw-logo.png" alt="Cowrywise Logo" style="width: 80px; height:80px; object-fit: contain;">
             </div>
             <h1>Cowrywise</h1>
             <p>Voice Assistant</p>
@@ -358,7 +358,7 @@
                     formData.append("audio", audioBlob, "audio.wav");
 
                     try {
-                        const response = await fetch("http://127.0.0.1:9000/voice-assist", {
+                        const response = await fetch("/voice-assist", {
                             method: "POST",
                             body: formData
                         });

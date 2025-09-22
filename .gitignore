@@ -1,0 +1,11 @@
+# don’t upload these
+.env
+data/
+*.json
+*.csv
+*.npy
+audio.wav
+cleaned.wav
+normalized.wav
+*.pkl
+__pycache__/
