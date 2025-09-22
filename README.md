@@ -76,8 +76,8 @@ question,answer
 * Requires microphone permission
 * Latency may occur on first load
 
-## Further Work
-* Integrate with an LLM 
+## 👩‍💻 Further Work
+[] Integrate with an LLM
 
 ## 👨‍💻 Author
 
