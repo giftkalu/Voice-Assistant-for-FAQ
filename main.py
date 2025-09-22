@@ -195,7 +195,10 @@ async def voice_assist(audio: UploadFile = File(...)):
     except Exception as e:
         print(f"Error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
-
+        
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    import os
+    
+    port = int(os.environ.get("PORT", 8000))  # use Render's PORT if available
+    uvicorn.run(app, host="0.0.0.0", port=port)
