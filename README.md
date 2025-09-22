@@ -1,92 +1,83 @@
+
 # 🎤 Voice FAQ Assistant
 
-👉 **[Live Demo(not working yet)](https://your-live-site-link.com)** 👈
+An AI-powered voice assistant that answers frequently asked questions using speech recognition, natural language processing, and text-to-speech.
 
-AI-powered voice assistant that answers FAQs using speech recognition, natural language processing, and text-to-speech.
+## ✨ Key Features
 
-## ✨ Features
+* 🎙️ **Voice Recognition** with Whisper
+* 🤖 **Smart FAQ Matching** using semantic similarity
+* 🔊 **Text-to-Speech Responses** with gTTS
+* 🌐 **Web Interface** with real-time audio visualization and silence detection
+* ⚡ **Fast & Lightweight** — built with FastAPI + Vanilla JS
 
-* 🎙️ Voice recognition (record questions)
-* 🤖 Smart FAQ matching with embeddings
-* 🔊 Text-to-speech responses
-* 📊 Real-time audio visualization
-* 📱 Responsive web interface
+## 🚀 Tech Stack
 
-## 🛠️ Tech Stack
-
-* **Backend**: FastAPI
+* **Backend**: FastAPI (Python)
 * **AI/ML**: Whisper, Sentence Transformers, spaCy
-* **Audio**: Librosa, PyDub, Noise Reduction
-* **TTS**: Google gTTS
-* **Frontend**: JavaScript + HTML5
+* **TTS**: gTTS
+* **Frontend**: HTML + JavaScript
+* **Deployment**: Railway / Render
 
-## 🚀 Getting Started
+## 📂 Project Structure
 
-1. **Clone repo**
+```
+voice-faq-assistant/
+├── main.py          # FastAPI backend
+├── fva.html         # Web interface
+├── 500faq.csv       # Demo FAQ dataset
+├── static/          # logo
+      └── cw-logo.png
+├── requirements.txt # Dependencies
+└── README.md
+```
+
+## ▶️ Quick Start
+
+1. Clone the repository
 
    ```bash
-   git clone https://github.com/giftkalu/Voice-Assistant-for-FAQ.git
-   cd Voice-Assistant-for-FAQ
+   git clone https://github.com/yourusername/voice-faq-assistant.git
+   cd voice-faq-assistant
    ```
-
-2. **Install dependencies**
+2. Install dependencies
 
    ```bash
    pip install -r requirements.txt
    python -m spacy download en_core_web_sm
    ```
-
-3. **Run locally**
+3. Run the app
 
    ```bash
    python main.py
    ```
+4. Open `http://localhost:8000` in your browser
 
-   Open [http://localhost:8000](http://localhost:8000).
-
-## 📁 Project Structure
+## 📊 How It Works
 
 ```
-voice-faq-assistant/
-├── main.py            # FastAPI backend
-├── fva.html           # Web interface
-├── sample_faq.json    # Example FAQs
-├── requirements.txt   # Dependencies
-└── README.md
+Voice Input → Whisper (STT) → Embeddings (Sentence Transformers) 
+→ FAQ Match → gTTS (TTS) → Voice Output
 ```
 
-## 📝 FAQ Data Format
+## 🎯 Demo Dataset
 
-CSV file with columns:
+`500faq.csv` contains a few FAQs sourced from **publicly available info** (e.g., “What is Cowrywise?”).
 
-```csv
-question,answer
-"What is Cowrywise?","Cowrywise is a digital savings and investment platform..."
-```
+## 📝 Roadmap
 
-## 🔒 Security
+* [ ] Integrate with LLM
 
-* No audio stored (processed & deleted immediately)
-* File validation (only audio files)
-* CORS protection enabled
+## 🚀 Live Demo
+Try it here: [voice-faq-assistant-demo](https://cw-voice-assistant-5c68.onrender.com)
 
-## ⚠️ Known Issues
+*(Demo runs on few sample FAQs from public info. May take a few seconds to respond on free hosting.)*
 
-* Works best with WAV/MP3/M4A
-* Requires microphone permission
-* Latency may occur on first load
-
-## 👩‍💻 Further Work
-[] Integrate with an LLM
 
 ## 👨‍💻 Author
 
-**Gift Kalu** – *Your Creative Data Scientist*
-
-* LinkedIn: [Gift Kalu](https://www.linkedin.com/in/gift-kalu)
+**Gift Kalu** – [LinkedIn](https://www.linkedin.com/in/gift-kalu) | [GitHub](https://github.com/giftkalu)
 
 ---
 
-⭐ Star this repo if you like it!
-
----
+⭐ Star this repo if you find it useful!
