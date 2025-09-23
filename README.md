@@ -17,7 +17,7 @@ An AI-powered voice assistant that answers frequently asked questions using spee
 * **AI/ML**: Whisper, Sentence Transformers, spaCy
 * **TTS**: gTTS
 * **Frontend**: HTML + JavaScript
-* **Deployment**: Railway / Render
+
 
 ## 📂 Project Structure
 
@@ -52,6 +52,7 @@ voice-faq-assistant/
    python main.py
    ```
 4. Open `http://localhost:8000` in your browser
+5. For better voice rendering. Run in Google Colab and use ngrok to expose localhost port to the web.
 
 ## 📊 How It Works
 
